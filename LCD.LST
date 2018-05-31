@@ -1,0 +1,391 @@
+A51 MACRO ASSEMBLER  LCD                                                                  05/31/2018 17:31:53 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.2.7.0
+OBJECT MODULE PLACED IN LCD.OBJ
+ASSEMBLER INVOKED BY: C:\Proramme\Keil_v5\C51\BIN\A51.EXE LCD.a51 SET(SMALL) DEBUG EP
+
+LOC  OBJ            LINE     SOURCE
+
+                       1     ;------------------------------------------------------------------------------
+                       2     $nomod51        ; disable predefined 8051 registers
+                       3     ;$include (REG517A.INC)
+                +1     4     ;-------------------------------------------------------------------------------
+                +1     5     ; Copyright 1995-1996 KEIL Software, Inc.
+                +1     6     ; 80517A Processor Declarations
+                +1     7     ;-------------------------------------------------------------------------------
+                +1     8  +1 $save 
+                +1   200  +1 $restore 
+                +1   201     
+                     202     
+                     203     
+                     204     ; Vorgabedatei  
+                     205     
+                     206     ;Funktion:      LCD-Ausgabe
+                     207     
+                     208     
+                     209     ; Laborgruppe:B9
+                     210     
+                     211     
+                     212     ; Namen:Jannik Parma, Fabian Hartmann
+                     213     ;------------------------------------------------------------------------------
+                     214     ;=========================================
+                     215     ; Adressen
+                     216     ;=========================================
+  00FF               217                     RS              BIT P5.7
+  00FE               218                     RW              BIT     P5.6
+  00FD               219                     E               BIT     P5.5
+  00EF               220                     LCDBSY  BIT     P4.7
+                     221     ; ========================================
+                     222     ; Segmentdeklarationen
+                     223     ; ========================================
+                     224     stack           SEGMENT IDATA
+                     225     Programm        SEGMENT CODE
+                     226     
+----                 227     RSEG    stack
+0000                 228                     DS      2
+                     229                     
+----                 230                     CSEG    AT      0               ; Sprung zum
+0000 020000   F      231                     LJMP    main            ; Hauptprogramm (Resetvektor)
+                     232     
+----                 233     RSEG    Programm
+                     234     
+                     235                             USING   0  
+0000                 236     main:   
+0000 758100   F      237                     mov     SP,#stack-1
+                     238     
+                     239     ; ==============================================================================
+                     240     ; Initialisierungen
+                     241     ; ==============================================================================
+                     242     
+                     243     ;----- LCD initialisieren ----------
+0003 120000   F      244                     call    lcd_init
+                     245     ;----- Text "Temperatur:" ausgeben -----
+0006 7D00            246                     mov     r5, #0           ; LCD-Position für "Temperatur:"
+0008 120000   F      247                     call    LCD_Pos          ; Cursor an diese Stelle
+000B 900000   F      248                     mov dptr, #text1         ; siehe Deklaration unten (Feste Programmdaten)
+000E 120000   F      249                     call    LCD_Festtext
+A51 MACRO ASSEMBLER  LCD                                                                  05/31/2018 17:31:53 PAGE     2
+
+                     250     ;----- Text "?C" ausgeben -----
+0011 7D4E            251                     mov     r5, #4Eh                 ; LCD-Position für °C
+0013 120000   F      252                     call    LCD_Pos
+0016 900000   F      253                     mov dptr, #text2
+0019 120000   F      254                     call    LCD_Festtext
+                     255     
+                     256     ; ==============================================================================
+                     257     ; Hauptschleife 
+                     258     ; ==============================================================================
+001C                 259     loop:
+001C 80FE            260             jmp     loop
+                     261     ; Ende der Hauptschleife
+                     262     ; ------------------------------------------------------------------------------
+                     263     
+                     264     ; ==============================================================================
+                     265     ; Feste Programmdaten
+                     266     ; ==============================================================================
+001E 54656D70        267     text1:  db       'Temperatur:','$'                                                      
+0022 65726174                
+0026 75723A24                
+002A B04324          268     text2:  db       '°','C','$'
+                     269     ;============================================================================
+                     270     ; Alle Unterprogramme:
+                     271     
+                     272     ; ===================
+                     273     ; LCD-Initialisierung
+                     274     ; ===================
+002D                 275     lcd_init:
+002D 7F46            276                     mov R7, #70d     
+002F 120000   F      277                     call delay
+                     278                     
+0032 C2FF            279                     clr RS
+0034 C2FE            280                     clr RW
+0036 75E830          281                     mov P4, #30h        
+0039 D2FD            282                     setb E
+003B C2FD            283                     clr E
+003D 7F14            284                     mov R7, #20       
+003F 120000   F      285                     call delay
+                     286                     
+0042 D2FD            287                     setb E
+0044 C2FD            288                     clr E
+0046 7F01            289                     mov R7, #1        
+0048 120000   F      290                     call delay
+                     291                     
+004B D2FD            292                     setb E
+004D C2FD            293                     clr E
+                     294                     
+004F 120000   F      295                     call busy
+0052 22              296                     ret
+                     297                     
+                     298     ; ===================
+                     299     ;       DELAY
+                     300     ; ===================
+                     301     ;   Übergabeparameter R7 enthält Zahlenwert prportional zur Delayzeit
+                     302     ;   Forderung: Bei einem Übergabewert R7 := 1 soll
+                     303     ;   die Verzögerung wenig über 100 us   betragen
+0053                 304     delay:
+0053 7DFA            305     m2:             mov R5, #0FAh    
+0055 DDFE            306     m1:             djnz R5, m1              
+0057 DFFA            307                     djnz R7, m2              
+0059 22              308                     ret                              
+                     309     ; ***************************************
+                     310     ; LCD Busy Flag
+                     311     ; ***************************************
+                     312     ; Beim Simulationstest des Programms muss diese Funktion nach dem Einsprung
+                     313     ; sofort wieder mit ret verlassen werden! (Warum?) Weil wir kein LCD Display haben, das ant
+A51 MACRO ASSEMBLER  LCD                                                                  05/31/2018 17:31:53 PAGE     3
+
+                             worten könnte        
+005A                 314     busy:
+005A 22              315                     ret                      
+005B C2FF            316                     clr RS
+005D 75E880          317                     mov P4, #80h  
+0060 D2FE            318                     setb RW
+0062 D2FD            319                     setb E
+0064 20EFFD          320     warte:  jb LCDBSY, warte  
+0067 C2FD            321                     clr E
+0069 22              322                     ret
+                     323     
+                     324     ; ====================
+                     325     ; Cursor positionieren
+                     326     ; ====================
+                     327     ; Übergabeparameter: R5 enthält DDRAM-AdressSet-Wert
+006A                 328     LCD_Pos:
+006A C2FF            329                     clr RS           
+006C C2FE            330                     clr RW           
+006E 8DE8            331                     mov P4, R5       
+0070 D2EF            332                     setb P4.7        
+0072 D2FD            333                     setb E
+0074 C2FD            334                     clr E
+0076 22              335                     ret
+                     336     
+                     337     ; ============================================
+                     338     ;       Standardtext aus Tabelle auf LCD schreiben
+                     339     ; ============================================
+                     340     ;       Übergabeparameter: dptr enthält Textadresse
+                     341     
+0077                 342     LCD_Festtext:
+0077 D2FF            343                     setb RS                                          
+0079 C2FE            344                     clr RW
+007B                 345     Ausgabeschleife:
+007B E0              346                     movx a, @dptr                            
+007C B42401          347                     cjne a, #'$', nichtzuende        
+007F 22              348                     ret                                                      
+0080                 349     nichtzuende:
+0080 F5E8            350                     mov P4, a                                        
+0082 D2FD            351                     setb E                                           
+0084 C2FD            352                     clr E
+0086 A3              353                     inc dptr                                         
+0087 80F2            354                     jmp Ausgabeschleife
+0089 22              355                     ret
+                     356     
+                     357     ;====================================================================
+                     358     ; ---------------------------------------
+                     359                     END                     
+                             
+A51 MACRO ASSEMBLER  LCD                                                                  05/31/2018 17:31:53 PAGE     4
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+AC . . . . . . . .  B ADDR   00D0H.6 A   
+ACC. . . . . . . .  D ADDR   00E0H   A   
+ADCON0 . . . . . .  D ADDR   00D8H   A   
+ADCON1 . . . . . .  D ADDR   00DCH   A   
+ADDATH . . . . . .  D ADDR   00D9H   A   
+ADDATL . . . . . .  D ADDR   00DAH   A   
+ADEX . . . . . . .  B ADDR   00D8H.5 A   
+ADM. . . . . . . .  B ADDR   00D8H.3 A   
+ARCON. . . . . . .  D ADDR   00EFH   A   
+AUSGABESCHLEIFE. .  C ADDR   007BH   R   SEG=PROGRAMM
+B. . . . . . . . .  D ADDR   00F0H   A   
+BD . . . . . . . .  B ADDR   00D8H.7 A   
+BSY. . . . . . . .  B ADDR   00D8H.4 A   
+BUSY . . . . . . .  C ADDR   005AH   R   SEG=PROGRAMM
+CC4EN. . . . . . .  D ADDR   00C9H   A   
+CCEN . . . . . . .  D ADDR   00C1H   A   
+CCH1 . . . . . . .  D ADDR   00C3H   A   
+CCH2 . . . . . . .  D ADDR   00C5H   A   
+CCH3 . . . . . . .  D ADDR   00C7H   A   
+CCH4 . . . . . . .  D ADDR   00CFH   A   
+CCL1 . . . . . . .  D ADDR   00C2H   A   
+CCL2 . . . . . . .  D ADDR   00C4H   A   
+CCL3 . . . . . . .  D ADDR   00C6H   A   
+CCL4 . . . . . . .  D ADDR   00CEH   A   
+CLK. . . . . . . .  B ADDR   00D8H.6 A   
+CLRMSK . . . . . .  D ADDR   00A6H   A   
+CMEN . . . . . . .  D ADDR   00F6H   A   
+CMH0 . . . . . . .  D ADDR   00D3H   A   
+CMH1 . . . . . . .  D ADDR   00D5H   A   
+CMH2 . . . . . . .  D ADDR   00D7H   A   
+CMH3 . . . . . . .  D ADDR   00E3H   A   
+CMH4 . . . . . . .  D ADDR   00E5H   A   
+CMH5 . . . . . . .  D ADDR   00E7H   A   
+CMH6 . . . . . . .  D ADDR   00F3H   A   
+CMH7 . . . . . . .  D ADDR   00F5H   A   
+CML0 . . . . . . .  D ADDR   00D2H   A   
+CML1 . . . . . . .  D ADDR   00D4H   A   
+CML2 . . . . . . .  D ADDR   00D6H   A   
+CML3 . . . . . . .  D ADDR   00E2H   A   
+CML4 . . . . . . .  D ADDR   00E4H   A   
+CML5 . . . . . . .  D ADDR   00E6H   A   
+CML6 . . . . . . .  D ADDR   00F2H   A   
+CML7 . . . . . . .  D ADDR   00F4H   A   
+CMSEL. . . . . . .  D ADDR   00F7H   A   
+COMCLRH. . . . . .  D ADDR   00A4H   A   
+COMCLRL. . . . . .  D ADDR   00A3H   A   
+COMSETH. . . . . .  D ADDR   00A2H   A   
+COMSETL. . . . . .  D ADDR   00A1H   A   
+CRCH . . . . . . .  D ADDR   00CBH   A   
+CRCL . . . . . . .  D ADDR   00CAH   A   
+CTCON. . . . . . .  D ADDR   00E1H   A   
+CTRELH . . . . . .  D ADDR   00DFH   A   
+CTRELL . . . . . .  D ADDR   00DEH   A   
+CY . . . . . . . .  B ADDR   00D0H.7 A   
+DELAY. . . . . . .  C ADDR   0053H   R   SEG=PROGRAMM
+DPH. . . . . . . .  D ADDR   0083H   A   
+DPL. . . . . . . .  D ADDR   0082H   A   
+DPSEL. . . . . . .  D ADDR   0092H   A   
+E. . . . . . . . .  B ADDR   00F8H.5 A   
+EADC . . . . . . .  B ADDR   00B8H.0 A   
+A51 MACRO ASSEMBLER  LCD                                                                  05/31/2018 17:31:53 PAGE     5
+
+EAL. . . . . . . .  B ADDR   00A8H.7 A   
+ES . . . . . . . .  B ADDR   00A8H.4 A   
+ET0. . . . . . . .  B ADDR   00A8H.1 A   
+ET1. . . . . . . .  B ADDR   00A8H.3 A   
+ET2. . . . . . . .  B ADDR   00A8H.5 A   
+EX0. . . . . . . .  B ADDR   00A8H.0 A   
+EX1. . . . . . . .  B ADDR   00A8H.2 A   
+EX2. . . . . . . .  B ADDR   00B8H.1 A   
+EX3. . . . . . . .  B ADDR   00B8H.2 A   
+EX4. . . . . . . .  B ADDR   00B8H.3 A   
+EX5. . . . . . . .  B ADDR   00B8H.4 A   
+EX6. . . . . . . .  B ADDR   00B8H.5 A   
+EXEN2. . . . . . .  B ADDR   00B8H.7 A   
+EXF2 . . . . . . .  B ADDR   00C0H.7 A   
+F0 . . . . . . . .  B ADDR   00D0H.5 A   
+F1 . . . . . . . .  B ADDR   00D0H.1 A   
+I2FR . . . . . . .  B ADDR   00C8H.5 A   
+I3FR . . . . . . .  B ADDR   00C8H.6 A   
+IADC . . . . . . .  B ADDR   00C0H.0 A   
+IE0. . . . . . . .  B ADDR   0088H.1 A   
+IE1. . . . . . . .  B ADDR   0088H.3 A   
+IEN0 . . . . . . .  D ADDR   00A8H   A   
+IEN1 . . . . . . .  D ADDR   00B8H   A   
+IEN2 . . . . . . .  D ADDR   009AH   A   
+IEX2 . . . . . . .  B ADDR   00C0H.1 A   
+IEX3 . . . . . . .  B ADDR   00C0H.2 A   
+IEX4 . . . . . . .  B ADDR   00C0H.3 A   
+IEX5 . . . . . . .  B ADDR   00C0H.4 A   
+IEX6 . . . . . . .  B ADDR   00C0H.5 A   
+INT0 . . . . . . .  B ADDR   00B0H.2 A   
+INT1 . . . . . . .  B ADDR   00B0H.3 A   
+IP0. . . . . . . .  D ADDR   00A9H   A   
+IP1. . . . . . . .  D ADDR   00B9H   A   
+IRCON. . . . . . .  D ADDR   00C0H   A   
+IRCON1 . . . . . .  D ADDR   00D1H   A   
+IT0. . . . . . . .  B ADDR   0088H.0 A   
+IT1. . . . . . . .  B ADDR   0088H.2 A   
+LCDBSY . . . . . .  B ADDR   00E8H.7 A   
+LCD_FESTTEXT . . .  C ADDR   0077H   R   SEG=PROGRAMM
+LCD_INIT . . . . .  C ADDR   002DH   R   SEG=PROGRAMM
+LCD_POS. . . . . .  C ADDR   006AH   R   SEG=PROGRAMM
+LOOP . . . . . . .  C ADDR   001CH   R   SEG=PROGRAMM
+M1 . . . . . . . .  C ADDR   0055H   R   SEG=PROGRAMM
+M2 . . . . . . . .  C ADDR   0053H   R   SEG=PROGRAMM
+MAIN . . . . . . .  C ADDR   0000H   R   SEG=PROGRAMM
+MD0. . . . . . . .  D ADDR   00E9H   A   
+MD1. . . . . . . .  D ADDR   00EAH   A   
+MD2. . . . . . . .  D ADDR   00EBH   A   
+MD3. . . . . . . .  D ADDR   00ECH   A   
+MD4. . . . . . . .  D ADDR   00EDH   A   
+MD5. . . . . . . .  D ADDR   00EEH   A   
+MX0. . . . . . . .  B ADDR   00D8H.0 A   
+MX1. . . . . . . .  B ADDR   00D8H.1 A   
+MX2. . . . . . . .  B ADDR   00D8H.2 A   
+NICHTZUENDE. . . .  C ADDR   0080H   R   SEG=PROGRAMM
+OV . . . . . . . .  B ADDR   00D0H.2 A   
+P. . . . . . . . .  B ADDR   00D0H.0 A   
+P0 . . . . . . . .  D ADDR   0080H   A   
+P1 . . . . . . . .  D ADDR   0090H   A   
+P2 . . . . . . . .  D ADDR   00A0H   A   
+P3 . . . . . . . .  D ADDR   00B0H   A   
+P4 . . . . . . . .  D ADDR   00E8H   A   
+P5 . . . . . . . .  D ADDR   00F8H   A   
+P6 . . . . . . . .  D ADDR   00FAH   A   
+P7 . . . . . . . .  D ADDR   00DBH   A   
+P8 . . . . . . . .  D ADDR   00DDH   A   
+A51 MACRO ASSEMBLER  LCD                                                                  05/31/2018 17:31:53 PAGE     6
+
+PCON . . . . . . .  D ADDR   0087H   A   
+PROGRAMM . . . . .  C SEG    008AH       REL=UNIT
+PSW. . . . . . . .  D ADDR   00D0H   A   
+RB80 . . . . . . .  B ADDR   0098H.2 A   
+RD . . . . . . . .  B ADDR   00B0H.7 A   
+REN0 . . . . . . .  B ADDR   0098H.4 A   
+RI0. . . . . . . .  B ADDR   0098H.0 A   
+RS . . . . . . . .  B ADDR   00F8H.7 A   
+RS0. . . . . . . .  B ADDR   00D0H.3 A   
+RS1. . . . . . . .  B ADDR   00D0H.4 A   
+RW . . . . . . . .  B ADDR   00F8H.6 A   
+RXD. . . . . . . .  B ADDR   00B0H.0 A   
+S0BUF. . . . . . .  D ADDR   0099H   A   
+S0CON. . . . . . .  D ADDR   0098H   A   
+S0RELH . . . . . .  D ADDR   00BAH   A   
+S0RELL . . . . . .  D ADDR   00AAH   A   
+S1BUF. . . . . . .  D ADDR   009CH   A   
+S1CON. . . . . . .  D ADDR   009BH   A   
+S1RELH . . . . . .  D ADDR   00BBH   A   
+S1RELL . . . . . .  D ADDR   009DH   A   
+SETMSK . . . . . .  D ADDR   00A5H   A   
+SM0. . . . . . . .  B ADDR   0098H.7 A   
+SM1. . . . . . . .  B ADDR   0098H.6 A   
+SM20 . . . . . . .  B ADDR   0098H.5 A   
+SP . . . . . . . .  D ADDR   0081H   A   
+STACK. . . . . . .  I SEG    0002H       REL=UNIT
+SWDT . . . . . . .  B ADDR   00B8H.6 A   
+SYSCON . . . . . .  D ADDR   00B1H   A   
+T0 . . . . . . . .  B ADDR   00B0H.4 A   
+T1 . . . . . . . .  B ADDR   00B0H.5 A   
+T2CM . . . . . . .  B ADDR   00C8H.2 A   
+T2CON. . . . . . .  D ADDR   00C8H   A   
+T2I0 . . . . . . .  B ADDR   00C8H.0 A   
+T2I1 . . . . . . .  B ADDR   00C8H.1 A   
+T2PS . . . . . . .  B ADDR   00C8H.7 A   
+T2R0 . . . . . . .  B ADDR   00C8H.3 A   
+T2R1 . . . . . . .  B ADDR   00C8H.4 A   
+TB80 . . . . . . .  B ADDR   0098H.3 A   
+TCON . . . . . . .  D ADDR   0088H   A   
+TEXT1. . . . . . .  C ADDR   001EH   R   SEG=PROGRAMM
+TEXT2. . . . . . .  C ADDR   002AH   R   SEG=PROGRAMM
+TF0. . . . . . . .  B ADDR   0088H.5 A   
+TF1. . . . . . . .  B ADDR   0088H.7 A   
+TF2. . . . . . . .  B ADDR   00C0H.6 A   
+TH0. . . . . . . .  D ADDR   008CH   A   
+TH1. . . . . . . .  D ADDR   008DH   A   
+TH2. . . . . . . .  D ADDR   00CDH   A   
+TI0. . . . . . . .  B ADDR   0098H.1 A   
+TL0. . . . . . . .  D ADDR   008AH   A   
+TL1. . . . . . . .  D ADDR   008BH   A   
+TL2. . . . . . . .  D ADDR   00CCH   A   
+TMOD . . . . . . .  D ADDR   0089H   A   
+TR0. . . . . . . .  B ADDR   0088H.4 A   
+TR1. . . . . . . .  B ADDR   0088H.6 A   
+TXD. . . . . . . .  B ADDR   00B0H.1 A   
+WARTE. . . . . . .  C ADDR   0064H   R   SEG=PROGRAMM
+WDT. . . . . . . .  B ADDR   00A8H.6 A   
+WDTH . . . . . . .  D ADDR   0085H   A   
+WDTL . . . . . . .  D ADDR   0084H   A   
+WDTREL . . . . . .  D ADDR   0086H   A   
+WR . . . . . . . .  B ADDR   00B0H.6 A   
+XPAGE. . . . . . .  D ADDR   0091H   A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)

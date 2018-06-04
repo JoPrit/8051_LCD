@@ -1,4 +1,4 @@
-A51 MACRO ASSEMBLER  LCD                                                                  05/31/2018 17:31:53 PAGE     1
+A51 MACRO ASSEMBLER  LCD                                                                  06/04/2018 14:51:13 PAGE     1
 
 
 MACRO ASSEMBLER A51 V8.2.7.0
@@ -65,7 +65,7 @@ LOC  OBJ            LINE     SOURCE
 0008 120000   F      247                     call    LCD_Pos          ; Cursor an diese Stelle
 000B 900000   F      248                     mov dptr, #text1         ; siehe Deklaration unten (Feste Programmdaten)
 000E 120000   F      249                     call    LCD_Festtext
-A51 MACRO ASSEMBLER  LCD                                                                  05/31/2018 17:31:53 PAGE     2
+A51 MACRO ASSEMBLER  LCD                                                                  06/04/2018 14:51:13 PAGE     2
 
                      250     ;----- Text "?C" ausgeben -----
 0011 7D4E            251                     mov     r5, #4Eh                 ; LCD-Position für °C
@@ -87,7 +87,7 @@ LOC  OBJ            LINE     SOURCE
 001E 54656D70        267     text1:  db       'Temperatur:','$'                                                      
 0022 65726174                
 0026 75723A24                
-002A B04324          268     text2:  db       '°','C','$'
+002A DF4324          268     text2:  db       0xDF,'C','$'
                      269     ;============================================================================
                      270     ; Alle Unterprogramme:
                      271     
@@ -115,75 +115,110 @@ LOC  OBJ            LINE     SOURCE
 004D C2FD            293                     clr E
                      294                     
 004F 120000   F      295                     call busy
-0052 22              296                     ret
-                     297                     
-                     298     ; ===================
-                     299     ;       DELAY
-                     300     ; ===================
-                     301     ;   Übergabeparameter R7 enthält Zahlenwert prportional zur Delayzeit
-                     302     ;   Forderung: Bei einem Übergabewert R7 := 1 soll
-                     303     ;   die Verzögerung wenig über 100 us   betragen
-0053                 304     delay:
-0053 7DFA            305     m2:             mov R5, #0FAh    
-0055 DDFE            306     m1:             djnz R5, m1              
-0057 DFFA            307                     djnz R7, m2              
-0059 22              308                     ret                              
-                     309     ; ***************************************
-                     310     ; LCD Busy Flag
-                     311     ; ***************************************
-                     312     ; Beim Simulationstest des Programms muss diese Funktion nach dem Einsprung
-                     313     ; sofort wieder mit ret verlassen werden! (Warum?) Weil wir kein LCD Display haben, das ant
-A51 MACRO ASSEMBLER  LCD                                                                  05/31/2018 17:31:53 PAGE     3
+                     296                     
+0052 C2FF            297                     clr RS
+0054 C2FE            298                     clr RW
+0056 75E838          299                     mov P4, #38h
+0059 D2FD            300                     setb E
+005B C2FD            301                     clr E
+                     302                     
+005D 120000   F      303                     call busy
+                     304                     
+0060 C2FF            305                     clr RS
+0062 C2FE            306                     clr RW
+0064 75E808          307                     mov P4, #08h
+0067 D2FD            308                     setb E
+0069 C2FD            309                     clr E
+                     310                     
+006B 120000   F      311                     call busy
+                     312                     
+006E C2FF            313                     clr RS
+A51 MACRO ASSEMBLER  LCD                                                                  06/04/2018 14:51:13 PAGE     3
 
+0070 C2FE            314                     clr RW
+0072 75E801          315                     mov P4, #01h
+0075 D2FD            316                     setb E
+0077 C2FD            317                     clr E
+                     318                     
+0079 120000   F      319                     call busy
+                     320                     
+007C C2FF            321                     clr RS
+007E C2FE            322                     clr RW
+0080 75E802          323                     mov P4, #02h
+0083 D2FD            324                     setb E
+0085 C2FD            325                     clr E
+                     326                     
+0087 22              327                     ret
+                     328                     
+                     329     ; ===================
+                     330     ;       DELAY
+                     331     ; ===================
+                     332     ;   Übergabeparameter R7 enthält Zahlenwert prportional zur Delayzeit
+                     333     ;   Forderung: Bei einem Übergabewert R7 := 1 soll
+                     334     ;   die Verzögerung wenig über 100 us   betragen
+0088                 335     delay:
+0088 7DFA            336     m2:             mov R5, #0FAh    
+008A DDFE            337     m1:             djnz R5, m1              
+008C DFFA            338                     djnz R7, m2              
+008E 22              339                     ret                              
+                     340     ; ***************************************
+                     341     ; LCD Busy Flag
+                     342     ; ***************************************
+                     343     ; Beim Simulationstest des Programms muss diese Funktion nach dem Einsprung
+                     344     ; sofort wieder mit ret verlassen werden! (Warum?) Weil wir kein LCD Display haben, das ant
                              worten könnte        
-005A                 314     busy:
-005A 22              315                     ret                      
-005B C2FF            316                     clr RS
-005D 75E880          317                     mov P4, #80h  
-0060 D2FE            318                     setb RW
-0062 D2FD            319                     setb E
-0064 20EFFD          320     warte:  jb LCDBSY, warte  
-0067 C2FD            321                     clr E
-0069 22              322                     ret
-                     323     
-                     324     ; ====================
-                     325     ; Cursor positionieren
-                     326     ; ====================
-                     327     ; Übergabeparameter: R5 enthält DDRAM-AdressSet-Wert
-006A                 328     LCD_Pos:
-006A C2FF            329                     clr RS           
-006C C2FE            330                     clr RW           
-006E 8DE8            331                     mov P4, R5       
-0070 D2EF            332                     setb P4.7        
-0072 D2FD            333                     setb E
-0074 C2FD            334                     clr E
-0076 22              335                     ret
-                     336     
-                     337     ; ============================================
-                     338     ;       Standardtext aus Tabelle auf LCD schreiben
-                     339     ; ============================================
-                     340     ;       Übergabeparameter: dptr enthält Textadresse
-                     341     
-0077                 342     LCD_Festtext:
-0077 D2FF            343                     setb RS                                          
-0079 C2FE            344                     clr RW
-007B                 345     Ausgabeschleife:
-007B E0              346                     movx a, @dptr                            
-007C B42401          347                     cjne a, #'$', nichtzuende        
-007F 22              348                     ret                                                      
-0080                 349     nichtzuende:
-0080 F5E8            350                     mov P4, a                                        
-0082 D2FD            351                     setb E                                           
-0084 C2FD            352                     clr E
-0086 A3              353                     inc dptr                                         
-0087 80F2            354                     jmp Ausgabeschleife
-0089 22              355                     ret
-                     356     
-                     357     ;====================================================================
-                     358     ; ---------------------------------------
-                     359                     END                     
+008F                 345     busy:
+008F 22              346                     ret                      
+0090 C2FF            347                     clr RS
+0092 75E880          348                     mov P4, #80h  
+0095 D2FE            349                     setb RW
+0097 D2FD            350                     setb E
+0099 20EFFD          351     warte:  jb LCDBSY, warte  
+009C C2FD            352                     clr E
+009E 22              353                     ret
+                     354     
+                     355     ; ====================
+                     356     ; Cursor positionieren
+                     357     ; ====================
+                     358     ; Übergabeparameter: R5 enthält DDRAM-AdressSet-Wert
+009F                 359     LCD_Pos:
+009F C2FF            360                     clr RS           
+00A1 C2FE            361                     clr RW           
+00A3 8DE8            362                     mov P4, R5       
+00A5 D2EF            363                     setb P4.7        
+00A7 D2FD            364                     setb E
+00A9 C2FD            365                     clr E
+00AB 22              366                     ret
+                     367     
+                     368     ; ============================================
+                     369     ;       Standardtext aus Tabelle auf LCD schreiben
+                     370     ; ============================================
+                     371     ;       Übergabeparameter: dptr enthält Textadresse
+                     372     
+00AC                 373     LCD_Festtext:
+00AC                 374     Ausgabeschleife:
+00AC E500            375                     mov a, 0                                         
+00AE 93              376                     movc a, @a+dptr                          
+00AF B42401          377                     cjne a, #'$', nichtzuende        
+00B2 22              378                     ret                                                      
+A51 MACRO ASSEMBLER  LCD                                                                  06/04/2018 14:51:13 PAGE     4
+
+00B3                 379     nichtzuende:
+00B3 120000   F      380                     call busy                                        
+00B6 D2FF            381                     setb RS                                          
+00B8 C2FE            382                     clr RW
+00BA F5E8            383                     mov P4, a                                        
+00BC D2FD            384                     setb E                                           
+00BE C2FD            385                     clr E
+00C0 A3              386                     inc dptr                                         
+00C1 80E9            387                     jmp Ausgabeschleife
+00C3 22              388                     ret
+                     389     
+                     390     ;====================================================================
+                     391     ; ---------------------------------------
+                     392                     END                     
                              
-A51 MACRO ASSEMBLER  LCD                                                                  05/31/2018 17:31:53 PAGE     4
+A51 MACRO ASSEMBLER  LCD                                                                  06/04/2018 14:51:13 PAGE     5
 
 SYMBOL TABLE LISTING
 ------ ----- -------
@@ -200,11 +235,11 @@ ADDATL . . . . . .  D ADDR   00DAH   A
 ADEX . . . . . . .  B ADDR   00D8H.5 A   
 ADM. . . . . . . .  B ADDR   00D8H.3 A   
 ARCON. . . . . . .  D ADDR   00EFH   A   
-AUSGABESCHLEIFE. .  C ADDR   007BH   R   SEG=PROGRAMM
+AUSGABESCHLEIFE. .  C ADDR   00ACH   R   SEG=PROGRAMM
 B. . . . . . . . .  D ADDR   00F0H   A   
 BD . . . . . . . .  B ADDR   00D8H.7 A   
 BSY. . . . . . . .  B ADDR   00D8H.4 A   
-BUSY . . . . . . .  C ADDR   005AH   R   SEG=PROGRAMM
+BUSY . . . . . . .  C ADDR   008FH   R   SEG=PROGRAMM
 CC4EN. . . . . . .  D ADDR   00C9H   A   
 CCEN . . . . . . .  D ADDR   00C1H   A   
 CCH1 . . . . . . .  D ADDR   00C3H   A   
@@ -245,13 +280,13 @@ CTCON. . . . . . .  D ADDR   00E1H   A
 CTRELH . . . . . .  D ADDR   00DFH   A   
 CTRELL . . . . . .  D ADDR   00DEH   A   
 CY . . . . . . . .  B ADDR   00D0H.7 A   
-DELAY. . . . . . .  C ADDR   0053H   R   SEG=PROGRAMM
+DELAY. . . . . . .  C ADDR   0088H   R   SEG=PROGRAMM
 DPH. . . . . . . .  D ADDR   0083H   A   
 DPL. . . . . . . .  D ADDR   0082H   A   
 DPSEL. . . . . . .  D ADDR   0092H   A   
 E. . . . . . . . .  B ADDR   00F8H.5 A   
 EADC . . . . . . .  B ADDR   00B8H.0 A   
-A51 MACRO ASSEMBLER  LCD                                                                  05/31/2018 17:31:53 PAGE     5
+A51 MACRO ASSEMBLER  LCD                                                                  06/04/2018 14:51:13 PAGE     6
 
 EAL. . . . . . . .  B ADDR   00A8H.7 A   
 ES . . . . . . . .  B ADDR   00A8H.4 A   
@@ -291,12 +326,12 @@ IRCON1 . . . . . .  D ADDR   00D1H   A
 IT0. . . . . . . .  B ADDR   0088H.0 A   
 IT1. . . . . . . .  B ADDR   0088H.2 A   
 LCDBSY . . . . . .  B ADDR   00E8H.7 A   
-LCD_FESTTEXT . . .  C ADDR   0077H   R   SEG=PROGRAMM
+LCD_FESTTEXT . . .  C ADDR   00ACH   R   SEG=PROGRAMM
 LCD_INIT . . . . .  C ADDR   002DH   R   SEG=PROGRAMM
-LCD_POS. . . . . .  C ADDR   006AH   R   SEG=PROGRAMM
+LCD_POS. . . . . .  C ADDR   009FH   R   SEG=PROGRAMM
 LOOP . . . . . . .  C ADDR   001CH   R   SEG=PROGRAMM
-M1 . . . . . . . .  C ADDR   0055H   R   SEG=PROGRAMM
-M2 . . . . . . . .  C ADDR   0053H   R   SEG=PROGRAMM
+M1 . . . . . . . .  C ADDR   008AH   R   SEG=PROGRAMM
+M2 . . . . . . . .  C ADDR   0088H   R   SEG=PROGRAMM
 MAIN . . . . . . .  C ADDR   0000H   R   SEG=PROGRAMM
 MD0. . . . . . . .  D ADDR   00E9H   A   
 MD1. . . . . . . .  D ADDR   00EAH   A   
@@ -307,7 +342,7 @@ MD5. . . . . . . .  D ADDR   00EEH   A
 MX0. . . . . . . .  B ADDR   00D8H.0 A   
 MX1. . . . . . . .  B ADDR   00D8H.1 A   
 MX2. . . . . . . .  B ADDR   00D8H.2 A   
-NICHTZUENDE. . . .  C ADDR   0080H   R   SEG=PROGRAMM
+NICHTZUENDE. . . .  C ADDR   00B3H   R   SEG=PROGRAMM
 OV . . . . . . . .  B ADDR   00D0H.2 A   
 P. . . . . . . . .  B ADDR   00D0H.0 A   
 P0 . . . . . . . .  D ADDR   0080H   A   
@@ -319,10 +354,10 @@ P5 . . . . . . . .  D ADDR   00F8H   A
 P6 . . . . . . . .  D ADDR   00FAH   A   
 P7 . . . . . . . .  D ADDR   00DBH   A   
 P8 . . . . . . . .  D ADDR   00DDH   A   
-A51 MACRO ASSEMBLER  LCD                                                                  05/31/2018 17:31:53 PAGE     6
+A51 MACRO ASSEMBLER  LCD                                                                  06/04/2018 14:51:13 PAGE     7
 
 PCON . . . . . . .  D ADDR   0087H   A   
-PROGRAMM . . . . .  C SEG    008AH       REL=UNIT
+PROGRAMM . . . . .  C SEG    00C4H       REL=UNIT
 PSW. . . . . . . .  D ADDR   00D0H   A   
 RB80 . . . . . . .  B ADDR   0098H.2 A   
 RD . . . . . . . .  B ADDR   00B0H.7 A   
@@ -376,7 +411,7 @@ TMOD . . . . . . .  D ADDR   0089H   A
 TR0. . . . . . . .  B ADDR   0088H.4 A   
 TR1. . . . . . . .  B ADDR   0088H.6 A   
 TXD. . . . . . . .  B ADDR   00B0H.1 A   
-WARTE. . . . . . .  C ADDR   0064H   R   SEG=PROGRAMM
+WARTE. . . . . . .  C ADDR   0099H   R   SEG=PROGRAMM
 WDT. . . . . . . .  B ADDR   00A8H.6 A   
 WDTH . . . . . . .  D ADDR   0085H   A   
 WDTL . . . . . . .  D ADDR   0084H   A   

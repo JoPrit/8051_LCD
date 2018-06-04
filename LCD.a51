@@ -66,7 +66,7 @@ loop:
 ; Feste Programmdaten
 ; ==============================================================================
 text1:	db	 'Temperatur:','$'							
-text2:	db	 '°','C','$'
+text2:	db	 0xDF,'C','$'
 ;============================================================================
 ; Alle Unterprogramme:
 
@@ -94,6 +94,37 @@ lcd_init:
 		clr E
 		//1.tes mal busy flag abfragen
 		call busy
+		//(4) Function set
+		clr RS
+		clr RW
+		mov P4, #38h
+		setb E
+		clr E
+		//2tes mal busy flag abfragen
+		call busy
+		//(5) Display Off
+		clr RS
+		clr RW
+		mov P4, #08h
+		setb E
+		clr E
+		//3tes mal busy flag abfragen
+		call busy
+		//(6) Display clear
+		clr RS
+		clr RW
+		mov P4, #01h
+		setb E
+		clr E
+		//4tes mal busy flag abfragen
+		call busy
+		//(7) Function set
+		clr RS
+		clr RW
+		mov P4, #02h
+		setb E
+		clr E
+		//Ende Init
 		ret
 		
 ; ===================
@@ -141,13 +172,15 @@ LCD_Pos:
 ; 	Übergabeparameter: dptr enthält Textadresse
 
 LCD_Festtext:
-		setb RS						//RS und RW vorbereiten
-		clr RW
 Ausgabeschleife:
-		movx a, @dptr				//ASCII zeichen von der stelle, auf die dptr zeigt in a laden
+		mov a, 0					//a mit 0 vorladen, damit wir mit dem anfangen, auf das dptr zeigt
+		movc a, @a+dptr				//ASCII zeichen von der stelle, auf die dptr zeigt in a laden
 		cjne a, #'$', nichtzuende	//Pruefen, ob das Zeichen '$' ist, welches als ENDE-zeichen benutzt wird
 		ret							//Wenn ja, dann raus aus dem Unterprogramm
 nichtzuende:
+		call busy					//busy flag abfragen, bevor der ausgang gesetzt wird
+		setb RS						//RS und RW vorbereiten
+		clr RW
 		mov P4, a					//Wenn nein, dann das Zeichen auf den Bus legen
 		setb E						//Und uebergeben
 		clr E

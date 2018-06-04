@@ -1,4 +1,4 @@
-BL51 BANKED LINKER/LOCATER V6.22.2.0                                                    05/31/2018  17:31:53  PAGE 1
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                    06/04/2018  14:51:13  PAGE 1
 
 
 BL51 BANKED LINKER/LOCATER V6.22.2.0, INVOKED BY:
@@ -22,7 +22,7 @@ LINK MAP OF MODULE:  LCD (LCD)
             * * * * * * *   C O D E   M E M O R Y   * * * * * * *
             CODE    0000H     0003H     ABSOLUTE     
                     0003H     7FFDH                  *** GAP ***
-            CODE    8000H     008AH     UNIT         PROGRAMM
+            CODE    8000H     00C4H     UNIT         PROGRAMM
 
 
 
@@ -43,11 +43,11 @@ SYMBOL TABLE OF MODULE:  LCD (LCD)
   B:00D8H.5       SYMBOL        ADEX
   B:00D8H.3       SYMBOL        ADM
   D:00EFH         SYMBOL        ARCON
-  C:807BH         SYMBOL        AUSGABESCHLEIFE
+  C:80ACH         SYMBOL        AUSGABESCHLEIFE
   D:00F0H         SYMBOL        B
   B:00D8H.7       SYMBOL        BD
   B:00D8H.4       SYMBOL        BSY
-  C:805AH         SYMBOL        BUSY
+  C:808FH         SYMBOL        BUSY
   D:00C9H         SYMBOL        CC4EN
   D:00C1H         SYMBOL        CCEN
   D:00C3H         SYMBOL        CCH1
@@ -59,7 +59,7 @@ SYMBOL TABLE OF MODULE:  LCD (LCD)
   D:00C6H         SYMBOL        CCL3
   D:00CEH         SYMBOL        CCL4
   B:00D8H.6       SYMBOL        CLK
-BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  05/31/2018  17:31:53  PAGE 2
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  06/04/2018  14:51:13  PAGE 2
 
 
   D:00A6H         SYMBOL        CLRMSK
@@ -91,7 +91,7 @@ SYMBOL TABLE OF MODULE:  LCD (LCD)
   D:00DFH         SYMBOL        CTRELH
   D:00DEH         SYMBOL        CTRELL
   B:00D0H.7       SYMBOL        CY
-  C:8053H         SYMBOL        DELAY
+  C:8088H         SYMBOL        DELAY
   D:0083H         SYMBOL        DPH
   D:0082H         SYMBOL        DPL
   D:0092H         SYMBOL        DPSEL
@@ -119,7 +119,7 @@ SYMBOL TABLE OF MODULE:  LCD (LCD)
   B:0088H.1       SYMBOL        IE0
   B:0088H.3       SYMBOL        IE1
   D:00A8H         SYMBOL        IEN0
-BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  05/31/2018  17:31:53  PAGE 3
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  06/04/2018  14:51:13  PAGE 3
 
 
   D:00B8H         SYMBOL        IEN1
@@ -138,12 +138,12 @@ SYMBOL TABLE OF MODULE:  LCD (LCD)
   B:0088H.0       SYMBOL        IT0
   B:0088H.2       SYMBOL        IT1
   B:00E8H.7       SYMBOL        LCDBSY
-  C:8077H         SYMBOL        LCD_FESTTEXT
+  C:80ACH         SYMBOL        LCD_FESTTEXT
   C:802DH         SYMBOL        LCD_INIT
-  C:806AH         SYMBOL        LCD_POS
+  C:809FH         SYMBOL        LCD_POS
   C:801CH         SYMBOL        LOOP
-  C:8055H         SYMBOL        M1
-  C:8053H         SYMBOL        M2
+  C:808AH         SYMBOL        M1
+  C:8088H         SYMBOL        M2
   C:8000H         SYMBOL        MAIN
   D:00E9H         SYMBOL        MD0
   D:00EAH         SYMBOL        MD1
@@ -154,7 +154,7 @@ SYMBOL TABLE OF MODULE:  LCD (LCD)
   B:00D8H.0       SYMBOL        MX0
   B:00D8H.1       SYMBOL        MX1
   B:00D8H.2       SYMBOL        MX2
-  C:8080H         SYMBOL        NICHTZUENDE
+  C:80B3H         SYMBOL        NICHTZUENDE
   B:00D0H.2       SYMBOL        OV
   B:00D0H.0       SYMBOL        P
   D:0080H         SYMBOL        P0
@@ -179,7 +179,7 @@ SYMBOL TABLE OF MODULE:  LCD (LCD)
   B:00B0H.0       SYMBOL        RXD
   D:0099H         SYMBOL        S0BUF
   D:0098H         SYMBOL        S0CON
-BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  05/31/2018  17:31:53  PAGE 4
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  06/04/2018  14:51:13  PAGE 4
 
 
   D:00BAH         SYMBOL        S0RELH
@@ -222,7 +222,7 @@ SYMBOL TABLE OF MODULE:  LCD (LCD)
   B:0088H.4       SYMBOL        TR0
   B:0088H.6       SYMBOL        TR1
   B:00B0H.1       SYMBOL        TXD
-  C:8064H         SYMBOL        WARTE
+  C:8099H         SYMBOL        WARTE
   B:00A8H.6       SYMBOL        WDT
   D:0085H         SYMBOL        WDTH
   D:0084H         SYMBOL        WDTL
@@ -239,7 +239,7 @@ SYMBOL TABLE OF MODULE:  LCD (LCD)
   C:8011H         LINE#         52
   C:8013H         LINE#         53
   C:8016H         LINE#         54
-BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  05/31/2018  17:31:53  PAGE 5
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  06/04/2018  14:51:13  PAGE 5
 
 
   C:8019H         LINE#         55
@@ -260,42 +260,70 @@ SYMBOL TABLE OF MODULE:  LCD (LCD)
   C:804BH         LINE#         93
   C:804DH         LINE#         94
   C:804FH         LINE#         96
-  C:8052H         LINE#         97
-  C:8053H         LINE#         106
-  C:8055H         LINE#         107
-  C:8057H         LINE#         108
-  C:8059H         LINE#         109
-  C:805AH         LINE#         116
-  C:805BH         LINE#         117
-  C:805DH         LINE#         118
-  C:8060H         LINE#         119
-  C:8062H         LINE#         120
-  C:8064H         LINE#         121
-  C:8067H         LINE#         122
-  C:8069H         LINE#         123
-  C:806AH         LINE#         130
-  C:806CH         LINE#         131
-  C:806EH         LINE#         132
-  C:8070H         LINE#         133
-  C:8072H         LINE#         134
-  C:8074H         LINE#         135
-  C:8076H         LINE#         136
-  C:8077H         LINE#         144
-  C:8079H         LINE#         145
-  C:807BH         LINE#         147
-  C:807CH         LINE#         148
-  C:807FH         LINE#         149
-  C:8080H         LINE#         151
-  C:8082H         LINE#         152
-  C:8084H         LINE#         153
-  C:8086H         LINE#         154
-  C:8087H         LINE#         155
-  C:8089H         LINE#         156
+  C:8052H         LINE#         98
+  C:8054H         LINE#         99
+  C:8056H         LINE#         100
+  C:8059H         LINE#         101
+  C:805BH         LINE#         102
+  C:805DH         LINE#         104
+  C:8060H         LINE#         106
+  C:8062H         LINE#         107
+  C:8064H         LINE#         108
+  C:8067H         LINE#         109
+  C:8069H         LINE#         110
+  C:806BH         LINE#         112
+  C:806EH         LINE#         114
+  C:8070H         LINE#         115
+  C:8072H         LINE#         116
+  C:8075H         LINE#         117
+  C:8077H         LINE#         118
+  C:8079H         LINE#         120
+  C:807CH         LINE#         122
+  C:807EH         LINE#         123
+  C:8080H         LINE#         124
+  C:8083H         LINE#         125
+  C:8085H         LINE#         126
+  C:8087H         LINE#         128
+  C:8088H         LINE#         137
+  C:808AH         LINE#         138
+  C:808CH         LINE#         139
+  C:808EH         LINE#         140
+  C:808FH         LINE#         147
+  C:8090H         LINE#         148
+  C:8092H         LINE#         149
+  C:8095H         LINE#         150
+  C:8097H         LINE#         151
+  C:8099H         LINE#         152
+  C:809CH         LINE#         153
+  C:809EH         LINE#         154
+  C:809FH         LINE#         161
+  C:80A1H         LINE#         162
+  C:80A3H         LINE#         163
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  06/04/2018  14:51:13  PAGE 6
+
+
+  C:80A5H         LINE#         164
+  C:80A7H         LINE#         165
+  C:80A9H         LINE#         166
+  C:80ABH         LINE#         167
+  C:80ACH         LINE#         176
+  C:80AEH         LINE#         177
+  C:80AFH         LINE#         178
+  C:80B2H         LINE#         179
+  C:80B3H         LINE#         181
+  C:80B6H         LINE#         182
+  C:80B8H         LINE#         183
+  C:80BAH         LINE#         184
+  C:80BCH         LINE#         185
+  C:80BEH         LINE#         186
+  C:80C0H         LINE#         187
+  C:80C1H         LINE#         188
+  C:80C3H         LINE#         189
   -------         ENDMOD        LCD
 
 ******************************************************************************
-* RESTRICTED VERSION WITH 0800H BYTE CODE SIZE LIMIT; USED: 008DH BYTE ( 6%) *
+* RESTRICTED VERSION WITH 0800H BYTE CODE SIZE LIMIT; USED: 00C7H BYTE ( 9%) *
 ******************************************************************************
 
-Program Size: data=10.0 xdata=0 code=141
+Program Size: data=10.0 xdata=0 code=199
 LINK/LOCATE RUN COMPLETE.  0 WARNING(S),  0 ERROR(S)
